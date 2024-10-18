@@ -1,28 +1,67 @@
-import { ActionPanel, Action, Icon, List } from "@raycast/api";
+import { Action, ActionPanel, List, showToast, Toast, getPreferenceValues } from "@raycast/api";
+import { useState, useEffect } from "react";
+import { processMarkdownFile, Bookmark } from "./util";
+import fuzzysort from "fuzzysort";
 
-const ITEMS = Array.from(Array(3).keys()).map((key) => {
-  return {
-    id: key,
-    icon: Icon.Bird,
-    title: "Title " + key,
-    subtitle: "Subtitle",
-    accessory: "Accessory",
-  };
-});
+interface Preferences {
+  bookmarkFilePath: string;
+}
 
 export default function Command() {
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [filteredBookmarks, setFilteredBookmarks] = useState<Bookmark[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const preferences = getPreferenceValues<Preferences>();
+    try {
+      const loadedBookmarks = processMarkdownFile(preferences.bookmarkFilePath);
+      setBookmarks(loadedBookmarks);
+      setFilteredBookmarks(loadedBookmarks);
+    } catch (error) {
+      console.error("Error loading bookmarks:", error);
+      showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to load bookmarks",
+        message: "Please check your bookmark file path in preferences",
+      });
+    }
+    setIsLoading(false);
+  }, []);
+
+  const handleSearchTextChange = (text: string) => {
+    if (text === "") {
+      setFilteredBookmarks(bookmarks);
+    } else {
+      const results = fuzzysort.go(text, bookmarks, { key: "title" });
+      setFilteredBookmarks(results.map((result) => result.obj));
+    }
+  };
+
   return (
-    <List>
-      {ITEMS.map((item) => (
+    <List
+      isLoading={isLoading}
+      onSearchTextChange={handleSearchTextChange}
+      searchBarPlaceholder="Search bookmarks..."
+      throttle
+    >
+      {filteredBookmarks.map((bookmark, index) => (
         <List.Item
-          key={item.id}
-          icon={item.icon}
-          title={item.title}
-          subtitle={item.subtitle}
-          accessories={[{ icon: Icon.Text, text: item.accessory }]}
+          key={index}
+          title={bookmark.title}
+          subtitle={bookmark.url}
           actions={
             <ActionPanel>
-              <Action.CopyToClipboard content={item.title} />
+              <Action.OpenInBrowser
+                title="Open Bookmark"
+                url={bookmark.url}
+                shortcut={{ modifiers: ["cmd"], key: "o" }}
+              />
+              <Action.CopyToClipboard
+                title="Copy URL"
+                content={bookmark.url}
+                shortcut={{ modifiers: ["cmd"], key: "c" }}
+              />
             </ActionPanel>
           }
         />
@@ -30,3 +69,4 @@ export default function Command() {
     </List>
   );
 }
+

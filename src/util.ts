@@ -3,6 +3,7 @@ import * as fs from 'fs';
 export interface Bookmark {
   title: string;
   url: string;
+  tags: string[];
 }
 
 export function processMarkdownFile(filePath: string): Bookmark[] {
@@ -20,20 +21,32 @@ export function processMarkdownContent(content: string): Bookmark[] {
 
     const match = trimmedLine.match(/\[([^\]]+)\]\(([^)]+)\)/);
     if (match) {
+      const [, title, url] = match;
+      const tags = extractTags(trimmedLine);
       bookmarks.push({
-        title: match[1],
-        url: match[2],
+        title: title,
+        url: url,
+        tags: tags,
       });
     } else {
       const urlMatch = trimmedLine.match(/https?:\/\/\S+/);
       if (urlMatch) {
+        const [url] = urlMatch;
+        const title = trimmedLine.replace(url, '').trim();
+        const tags = extractTags(trimmedLine);
         bookmarks.push({
-          title: trimmedLine,
-          url: urlMatch[0],
+          title: title || url,
+          url: url,
+          tags: tags,
         });
       }
     }
   }
 
   return bookmarks;
+}
+
+function extractTags(line: string): string[] {
+  const tagMatches = line.match(/#[\w-]+/g);
+  return tagMatches ? tagMatches.map(tag => tag.slice(1)) : [];
 }

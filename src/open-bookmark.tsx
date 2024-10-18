@@ -49,7 +49,9 @@ export default function Command() {
         <List.Item
           key={index}
           title={bookmark.title}
-          subtitle={bookmark.url}
+          accessories={[
+            { text: bookmark.tags.map(tag => `#${tag}`).join(' ') }
+          ]}
           actions={
             <ActionPanel>
               <Action.OpenInBrowser
@@ -69,4 +71,3 @@ export default function Command() {
     </List>
   );
 }
-

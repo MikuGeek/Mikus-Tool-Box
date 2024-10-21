@@ -11,9 +11,9 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "open-bookmark",
-      "title": "Open Bookmark",
-      "description": "Open bookmark",
+      "name": "search-bookmark",
+      "title": "Search Bookmark",
+      "description": "Search and open bookmarks from your markdown file",
       "mode": "view"
     }
   ],

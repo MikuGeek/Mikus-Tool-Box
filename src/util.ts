@@ -4,6 +4,12 @@ export interface Bookmark {
   title: string;
   url: string;
   tags: string[];
+  searchTerm: string;
+}
+
+function extractTags(line: string): string[] {
+  const tagMatches = line.match(/#[\w-]+/g);
+  return tagMatches ? tagMatches.map((tag) => tag.slice(1)) : [];
 }
 
 export function processMarkdownFile(filePath: string): Bookmark[] {
@@ -27,6 +33,7 @@ export function processMarkdownContent(content: string): Bookmark[] {
         title: title,
         url: url,
         tags: tags,
+        searchTerm: `${title} ${tags.join(' ')}`
       });
     } else {
       const urlMatch = trimmedLine.match(/https?:\/\/\S+/);
@@ -38,15 +45,11 @@ export function processMarkdownContent(content: string): Bookmark[] {
           title: title || url,
           url: url,
           tags: tags,
+          searchTerm: `${title || url} ${tags.join(' ')}`
         });
       }
     }
   }
 
   return bookmarks;
-}
-
-function extractTags(line: string): string[] {
-  const tagMatches = line.match(/#[\w-]+/g);
-  return tagMatches ? tagMatches.map(tag => tag.slice(1)) : [];
 }

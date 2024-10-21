@@ -33,7 +33,7 @@ export default function Command() {
     if (text === "") {
       setFilteredBookmarks(bookmarks);
     } else {
-      const results = fuzzysort.go(text, bookmarks, { key: "title" });
+      const results = fuzzysort.go(text, bookmarks, { key: "searchTerm" });
       setFilteredBookmarks(results.map((result) => result.obj));
     }
   };
@@ -42,7 +42,7 @@ export default function Command() {
     <List
       isLoading={isLoading}
       onSearchTextChange={handleSearchTextChange}
-      searchBarPlaceholder="Search bookmarks..."
+      searchBarPlaceholder="Search bookmarks by title or tags..."
       throttle
     >
       {filteredBookmarks.map((bookmark, index) => (

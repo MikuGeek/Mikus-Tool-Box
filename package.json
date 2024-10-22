@@ -1,10 +1,10 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "markdown-bookmark-opener",
-  "title": "Markdown Bookmark Opener",
-  "description": "Open bookmarks stored in md file",
+  "name": "miku-s-tool-box",
+  "title": "Miku's Tool Box",
+  "description": "A collection of useful tools by Miku",
   "icon": "extension-icon.png",
-  "author": "mikugeek",
+  "author": "miku",
   "categories": [
     "Productivity"
   ],
@@ -16,7 +16,29 @@
       "description": "Search and open bookmarks from your markdown file",
       "mode": "view"
     }
-  ],
+  ,
+    {
+      "name": "add-new-vocabulary",
+      "title": "Add New Vocabulary",
+      "description": "Add a new word or phrase to temp vocabulary book",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "content",
+          "placeholder": "Enter word or phrase",
+          "type": "text",
+          "required": true
+        }
+      ]
+    }
+  ,
+    {
+      "name": "export-new-vocabulary",
+      "title": "Export New Vocabulary",
+      "description": "Export and clean up temp vocabulary book to ~/Download",
+      "mode": "no-view"
+    }
+      ],
   "preferences": [
     {
       "name": "bookmarkFilePath",
@@ -25,6 +47,14 @@
       "title": "Bookmark File Path",
       "description": "The full path to your markdown file containing bookmarks",
       "placeholder": "/Users/username/Documents/bookmarks.md"
+    },
+    {
+      "name": "vocabularyFilePath",
+      "type": "textfield",
+      "required": true,
+      "title": "Vocabulary File Path",
+      "description": "The full path to your JSON file containing vocabulary",
+      "placeholder": "/Users/username/Documents/vocabulary.json"
     }
   ],
   "dependencies": {

@@ -15,8 +15,7 @@
       "title": "Search Bookmark",
       "description": "Search and open bookmarks from your markdown file",
       "mode": "view"
-    }
-  ,
+    },
     {
       "name": "add-new-vocabulary",
       "title": "Add New Vocabulary",
@@ -30,15 +29,28 @@
           "required": true
         }
       ]
-    }
-  ,
+    },
     {
       "name": "export-new-vocabulary",
       "title": "Export New Vocabulary",
       "description": "Export and clean up temp vocabulary book to ~/Download",
       "mode": "no-view"
+    },
+    {
+      "name": "post-flomo",
+      "title": "Post memo",
+      "description": "Post a memo to Flomo",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "memo",
+          "placeholder": "Enter your memo",
+          "type": "text",
+          "required": true
+        }
+      ]
     }
-      ],
+  ],
   "preferences": [
     {
       "name": "bookmarkFilePath",
@@ -55,11 +67,19 @@
       "title": "Vocabulary File Path",
       "description": "The full path to your JSON file containing vocabulary",
       "placeholder": "/Users/username/Documents/vocabulary.json"
+    },
+    {
+      "name": "flomoAuthUrl",
+      "title": "Flomo Auth URL",
+      "description": "Your Flomo API authentication URL",
+      "type": "textfield",
+      "required": true
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.84.3",
-    "@raycast/utils": "^1.17.0"
+    "@raycast/utils": "^1.17.0",
+    "node-fetch": "^3.3.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.11",

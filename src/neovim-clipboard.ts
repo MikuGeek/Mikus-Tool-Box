@@ -1,36 +1,70 @@
-import { showHUD } from "@raycast/api";
+import { showHUD, getSelectedText, Clipboard } from "@raycast/api";
 import { findNeovim, openInTerminal } from "./utils/terminal";
 import { ClipboardService } from "./services/clipboard-service";
 
+type ErrorWithMessage = {
+  message: string;
+};
+
+const ERROR_MESSAGES = {
+  GENERAL: "Failed to edit clipboard content",
+  NO_CLIPBOARD: "No text in clipboard",
+} as const;
+
+function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as Record<string, unknown>).message === "string"
+  );
+}
+
+function handleError(error: unknown): string {
+  if (isErrorWithMessage(error)) {
+    if (error.message.includes("Neovim not found")) {
+      return error.message;
+    }
+    if (error.message === ERROR_MESSAGES.NO_CLIPBOARD) {
+      return ERROR_MESSAGES.NO_CLIPBOARD;
+    }
+  }
+  return ERROR_MESSAGES.GENERAL;
+}
+
+/**
+ * Main command function to handle clipboard editing with Neovim
+ */
 export default async function Command() {
   try {
-    // Find Neovim installation
+    await handleSelectedText();
     const nvimPath = await findNeovim();
-
-    // Create a temporary file and save clipboard content
     const tmpFile = await ClipboardService.getTempFilePath();
+
     await ClipboardService.saveClipboardToFile(tmpFile);
-
-    // Open in terminal and wait for edit
-    await openInTerminal(nvimPath, tmpFile, true, true);
-
-    // Read the edited content back to clipboard
+    await openInTerminal({
+      nvimPath,
+      filePath: tmpFile,
+      useDefaultShell: true,
+      useVSCodeMode: true
+    });
     await ClipboardService.readFileToClipboard(tmpFile);
-
-    // Clean up
     await ClipboardService.cleanup(tmpFile);
 
     await showHUD("Updated clipboard with edited content");
   } catch (error) {
     console.error("Error:", error);
-    if (error instanceof Error) {
-      if (error.message.includes("Neovim not found")) {
-        await showHUD(error.message);
-      } else if (error.message === "No text in clipboard") {
-        await showHUD(error.message);
-      } else {
-        await showHUD("Failed to edit clipboard content");
-      }
-    }
+    await showHUD(handleError(error));
+  }
+}
+
+/**
+ * Handles copying selected text to clipboard if present
+ */
+async function handleSelectedText(): Promise<void> {
+  const selectedText = await getSelectedText();
+  if (selectedText) {
+    await Clipboard.copy(selectedText);
+    await showHUD("Copied selected text to clipboard");
   }
 }

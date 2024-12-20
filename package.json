@@ -50,7 +50,14 @@
         }
       ]
     }
-  ],
+  ,
+    {
+      "name": "neovim-clipboard",
+      "title": "NeoVim Clipboard",
+      "description": "Use NeoVim to edit the clipboard content",
+      "mode": "no-view"
+    }
+      ],
   "preferences": [
     {
       "name": "bookmarkFilePath",
